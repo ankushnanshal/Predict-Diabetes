@@ -32,11 +32,11 @@
                 <form id="signInForm" autocomplete="off">
                     <div class="form-group">
                         <label for="signInEmail">Email</label>
-                        <input type="email" id="signInEmail" required placeholder="name@example.com" autocomplete="one-time-code">
+                        <input type="email" id="signInEmail" required placeholder="name@example.com">
                     </div>
                     <div class="form-group">
                         <label for="signInPassword">Password</label>
-                        <input type="password" id="signInPassword" required placeholder="••••••••" autocomplete="new-password">
+                        <input type="password" id="signInPassword" required placeholder="••••••••">
                     </div>
                     <div id="signInError" class="auth-error hidden"></div>
                     <button type="submit" class="btn-submit">Sign In</button>
@@ -49,11 +49,11 @@
                 <form id="signUpForm" autocomplete="off">
                     <div class="form-group">
                         <label for="signUpEmail">Email</label>
-                        <input type="email" id="signUpEmail" required placeholder="name@example.com" autocomplete="one-time-code">
+                        <input type="email" id="signUpEmail" required placeholder="name@example.com">
                     </div>
                     <div class="form-group">
                         <label for="signUpPassword">Password</label>
-                        <input type="password" id="signUpPassword" required placeholder="••••••••" autocomplete="new-password">
+                        <input type="password" id="signUpPassword" required placeholder="••••••••">
                     </div>
                     <div id="signUpError" class="auth-error hidden"></div>
                     <button type="submit" class="btn-submit">Sign Up</button>
@@ -63,17 +63,18 @@
         </div>
     </div>
 
-    <div class="container animate-up" style="margin-top: 2rem;">
-        <header>
-            <h1>Diabetes Risk Predictor</h1>
-            <p>Enter the patient's clinical metrics below to estimate diabetes likelihood.</p>
-        </header>
-
-        <main class="card">
+    <div class="workspace-container animate-up">
+        
+        <main class="main-content-card">
             <div id="authBlocker" class="auth-blocker">
                 <p>Please log in to access the Diabetes Risk Predictor system.</p>
                 <button id="blockerLoginBtn" class="btn-submit" style="max-width: 200px;">Login Now</button>
             </div>
+
+            <header style="margin-bottom: 2rem;">
+                <h1>Diabetes Risk Predictor</h1>
+                <p style="color: var(--text-muted);">Enter the patient's clinical metrics below to estimate diabetes likelihood.</p>
+            </header>
 
             <form id="predictionForm">
                 <div class="form-grid">
@@ -90,7 +91,7 @@
 
                     <div class="form-group hidden" id="pregnanciesGroup">
                         <label for="Pregnancies">Pregnancies</label>
-                        <input type="number" id="Pregnancies" name="Pregnancies" min="0" max="20" value="0" placeholder="e.g., 2">
+                        <input type="number" id="Pregnancies" name="Pregnancies" min="0" max="20" value="0">
                         <small>Number of times pregnant</small>
                     </div>
 
@@ -108,7 +109,7 @@
 
                     <div class="form-group">
                         <label for="SkinThickness">Skin Thickness (mm)</label>
-                        <input type="number" id="SkinThickness" name="SkinThickness" min="0" max="100" placeholder="e.g., 23" required>
+                        <input type="number" id="SkinThickness" name="SkinThickness" min="0" max="100" placeholder="Auto-calculated or explicit value" required>
                         <small>Triceps skin fold thickness</small>
                     </div>
 
@@ -120,24 +121,24 @@
 
                     <div class="form-group">
                         <label for="BMI">BMI (kg/m²)</label>
-                        <input type="number" id="BMI" name="BMI" min="0" max="70" step="0.1" placeholder="e.g., 28.1" required>
+                        <input type="number" id="BMI" name="BMI" min="0" max="70" step="0.1" placeholder="Auto-calculated or explicit value" required>
                         <small>Body mass index</small>
                     </div>
 
                     <div class="form-group">
                         <label for="DiabetesPedigreeFunction">Diabetes Pedigree Function</label>
-                        <input type="number" id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" min="0" max="3" step="0.001" placeholder="e.g., 0.167" required>
+                        <input type="number" id="DiabetesPedigreeFunction" name="DiabetesPedigreeFunction" min="0" max="3" step="0.001" placeholder="Auto-calculated or explicit value" required>
                         <small>Family pedigree risk score index</small>
                     </div>
 
                     <div class="form-group">
                         <label for="Age">Age (years)</label>
-                        <input type="number" id="Age" name="Age" min="0" max="120" placeholder="e.g., 45" required>
+                        <input type="number" id="Age" name="Age" min="0" max="120" placeholder="Auto-calculated or explicit value" required>
                         <small>Patient's age</small>
                     </div>
                 </div>
 
-                <button type="submit" class="btn-submit">Analyze Risk</button>
+                <button type="submit" class="btn-submit" style="margin-top: 1rem;">Analyze Risk</button>
             </form>
 
             <div id="resultContainer" class="result-container hidden">
@@ -151,6 +152,56 @@
                 </div>
             </div>
         </main>
+
+        <aside class="sidebar-container">
+            <div class="sidebar-header">
+                <h3>Quick Assist Calculators</h3>
+                <p>Data maps straight into the form upon adjustment</p>
+            </div>
+
+            <div class="calc-box">
+                <h4>Skin Thickness Profile</h4>
+                <div class="form-group">
+                    <select id="sideSkinFrame" onchange="syncSkinThickness()">
+                        <option value="" disabled selected hidden>Select Body Type Frame</option>
+                        <option value="15">Lean / Athletic Frame (15mm)</option>
+                        <option value="20">Average Build Frame (20mm)</option>
+                        <option value="26">Above Average Frame (26mm)</option>
+                        <option value="35">High Caliper Frame (35mm)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="calc-box">
+                <h4>BMI Engine</h4>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <input type="number" id="sideWeight" placeholder="Wgt (kg)" step="0.1" oninput="syncBMI()">
+                    <input type="number" id="sideHeight" placeholder="Hgt (cm)" oninput="syncBMI()">
+                </div>
+            </div>
+
+            <div class="calc-box">
+                <h4>Family Pedigree Risk Index</h4>
+                <div class="form-group">
+                    <select id="sidePedigree" onchange="syncPedigree()">
+                        <option value="" disabled selected hidden>Select Pedigree Risk Profile</option>
+                        <option value="0.085">Trace / Non-diabetic lineage (0.085)</option>
+                        <option value="0.167">Low Risk / One distant grandparent (0.167)</option>
+                        <option value="0.450">Moderate Risk / One relative diagnosed (0.450)</option>
+                        <option value="0.750">High Risk / Biological parent diagnosed (0.750)</option>
+                        <option value="1.350">Severe History / Multiple core family (1.350)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="calc-box">
+                <h4>Age Assistant</h4>
+                <div class="form-group">
+                    <input type="number" id="sideBirthYear" placeholder="Enter Birth Year (e.g., 1995)" min="1900" max="2026" oninput="syncAge()">
+                </div>
+            </div>
+        </aside>
+
     </div>
 
     <script src="script.js"></script>

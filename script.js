@@ -1,3 +1,4 @@
+// Auth Dom Nodes Bindings
 const authModal = document.getElementById('authModal');
 const signInView = document.getElementById('signInView');
 const signUpView = document.getElementById('signUpView');
@@ -12,6 +13,51 @@ const genderSelect = document.getElementById('Gender');
 const pregnanciesGroup = document.getElementById('pregnanciesGroup');
 const pregnanciesInput = document.getElementById('Pregnancies');
 
+// --- DYNAMIC SIDEBAR SYNCHRONIZATION ENGINES ---
+
+// 1. Sync Skin Thickness
+function syncSkinThickness() {
+    const sideSkin = document.getElementById('sideSkinFrame').value;
+    if (sideSkin) {
+        document.getElementById('SkinThickness').value = sideSkin;
+    }
+}
+
+// 2. Compute & Sync BMI on typing
+function syncBMI() {
+    const weight = parseFloat(document.getElementById('sideWeight').value);
+    const heightCm = parseFloat(document.getElementById('sideHeight').value);
+    
+    if (weight && heightCm && heightCm > 0) {
+        const heightMeters = heightCm / 100;
+        const computedBMI = weight / (heightMeters * heightMeters);
+        document.getElementById('BMI').value = computedBMI.toFixed(1);
+    } else {
+        document.getElementById('BMI').value = '';
+    }
+}
+
+// 3. Sync Pedigree Risk Function
+function syncPedigree() {
+    const score = document.getElementById('sidePedigree').value;
+    if (score) {
+        document.getElementById('DiabetesPedigreeFunction').value = score;
+    }
+}
+
+// 4. Compute & Sync Age dynamically
+function syncAge() {
+    const birthYear = parseInt(document.getElementById('sideBirthYear').value);
+    const currentYear = 2026;
+    
+    if (birthYear && birthYear <= currentYear && birthYear > 1900) {
+        document.getElementById('Age').value = currentYear - birthYear;
+    } else {
+        document.getElementById('Age').value = '';
+    }
+}
+
+// Target toggle logic for Pregnancies configuration
 genderSelect.addEventListener('change', function() {
     if (this.value === 'Female') {
         pregnanciesGroup.classList.remove('hidden');
@@ -23,11 +69,11 @@ genderSelect.addEventListener('change', function() {
     }
 });
 
+// View switching logic inside Authentication System
 document.getElementById('switchToSignUp').addEventListener('click', () => {
     signInView.classList.add('hidden');
     signUpView.classList.remove('hidden');
 });
-
 document.getElementById('switchToSignIn').addEventListener('click', () => {
     signUpView.classList.add('hidden');
     signInView.classList.remove('hidden');
@@ -60,6 +106,7 @@ function checkLoginState() {
     }
 }
 
+// Auth Request Processing
 document.getElementById('signUpForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('signUpEmail').value;
@@ -73,7 +120,6 @@ document.getElementById('signUpForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password })
         });
         const data = await response.json();
-
         if (response.ok) {
             localStorage.setItem('userEmail', email);
             hideModal();
@@ -101,7 +147,6 @@ document.getElementById('signInForm').addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password })
         });
         const data = await response.json();
-
         if (response.ok) {
             localStorage.setItem('userEmail', email);
             hideModal();
@@ -123,6 +168,7 @@ navLogoutBtn.addEventListener('click', () => {
 
 checkLoginState();
 
+// Model Inference Pipelines Processing
 document.getElementById('predictionForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -153,7 +199,6 @@ document.getElementById('predictionForm').addEventListener('submit', async funct
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
-
         const result = await response.json();
 
         if (response.ok && result.status === 'success') {
@@ -173,9 +218,7 @@ document.getElementById('predictionForm').addEventListener('submit', async funct
 
             probabilityBar.style.width = `${result.probability}%`;
             probabilityText.textContent = `Calculated Risk Probability: ${result.probability}%`;
-            
             resultContainer.scrollIntoView({ behavior: 'smooth' });
-
         } else {
             alert('API Server Error: ' + (result.error || 'Failed to complete data inference.'));
         }

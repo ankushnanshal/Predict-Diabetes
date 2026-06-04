@@ -99,10 +99,9 @@ def predict():
     
     try:
         data = request.get_json()
-        patient_gender = data.get('Gender') 
         
         features = [
-            float(data['Pregnancies']),
+            float(data.get('Pregnancies', 0)),
             float(data['Glucose']),
             float(data['BloodPressure']),
             float(data['SkinThickness']),
