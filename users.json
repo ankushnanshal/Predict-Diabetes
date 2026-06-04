@@ -1,0 +1,8 @@
+{
+    "ankushnanshal007@gmail.com": {
+        "password": "scrypt:32768:8:1$psMnPDNuq5NFuIR0$3b050ee01753a55f5bad47fcb88a3b1c09ea858253368dc045e18fff87f99a4f48b3259c34318973498d673b12786e11e6d169e8a558c0b1005839e5f8e185ef"
+    },
+    "ankush@gmail.com": {
+        "password": "scrypt:32768:8:1$M3bDDFKkwqxwK1en$e1ad055a51ff0c48b0e3b87839dd657bb7760d2e57d3fcd24be3fc49bbac88d8abad863478b760cc8427568c20dc0caf832cfe53a28b4cded6fbb7baf746bf73"
+    }
+}

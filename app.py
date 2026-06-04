@@ -5,8 +5,25 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 import os
+import json
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__, template_folder='.', static_folder='.', static_url_path='')
+
+USER_DB_FILE = 'users.json'
+
+def load_users():
+    if not os.path.exists(USER_DB_FILE):
+        return {}
+    with open(USER_DB_FILE, 'r') as file:
+        try:
+            return json.load(file)
+        except json.JSONDecodeError:
+            return {}
+
+def save_users(users):
+    with open(USER_DB_FILE, 'w') as file:
+        json.dump(users, file, indent=4)
 
 def train_model():
     csv_path = 'diabetes.csv'
@@ -36,6 +53,45 @@ except Exception as e:
 def home():
     return render_template('index.html')
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and Password are required fields.'}), 400
+
+    users = load_users()
+    if email in users:
+        return jsonify({'error': 'An account with this email already exists.'}), 400
+
+    users[email] = {
+        'password': generate_password_hash(password)
+    }
+    save_users(users)
+    return jsonify({'status': 'success', 'message': 'Account provisioned successfully.'})
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and Password are required fields.'}), 400
+
+    users = load_users()
+    user = users.get(email)
+
+    if not user:
+        return jsonify({'error': 'No account found with this email.'}), 401
+    
+    if not check_password_hash(user['password'], password):
+        return jsonify({'error': 'Incorrect password. Please try again.'}), 401
+
+    return jsonify({'status': 'success', 'message': 'Authenticated successfully.'})
+
 @app.route('/predict', methods=['POST'])
 def predict():
     if model is None:
@@ -43,6 +99,7 @@ def predict():
     
     try:
         data = request.get_json()
+        patient_gender = data.get('Gender') 
         
         features = [
             float(data['Pregnancies']),
